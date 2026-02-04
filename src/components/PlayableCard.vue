@@ -4,7 +4,7 @@ import CardComponent from './Card.vue'
 
 const props = defineProps<{
   card: Card
-  cardIndex: number
+  cardId: string
   playerId: string
   selected: boolean
   invalid: boolean
@@ -12,12 +12,12 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'select', payload: {
-    cardIndex: number
+    cardId: string
   }): void
 }>()
 
 function onClick() {
-  emit('select', { cardIndex: props.cardIndex })
+  emit('select', { cardId: props.cardId })
 }
 </script>
 

@@ -1,10 +1,14 @@
 import { defineStore } from 'pinia'
-import { isAdjacent } from '../game/rules'
+import { reactive } from 'vue'
+import { createGameEngine, tryPlayCard } from '../game/engine/gameEngine'
+import { startAIScheduler } from '../game/ai/aiScheduler'
+import { createInitialGameState } from '../game/setup/gameSetup'
 
 
 export interface Card {
+  id: string
   rank: number
-  suit: string
+  suit: 'hearts' | 'diamonds' | 'clubs' | 'spades'
 }
 
 export interface PlayerState {
@@ -18,50 +22,39 @@ export interface GameState {
   status: 'playing' | 'blocked' | 'finished'
 }
 
-export const useGameStore = defineStore('game', {
-  state: (): GameState => ({
-    centerPiles: [
-      { rank: 1, suit: 'hearts' },
-      { rank: 13, suit: 'spades' }
-    ],
-    players: {'player1': {
-      deck: [],
-      revealed: [{ rank: 2, suit: 'hearts' }, { rank: 3, suit: 'hearts' }, { rank: 4, suit: 'hearts' }]
-    }},
-    status: 'playing'
-  }),
+export const useGameStore = defineStore('game', () => {
+  // engine singleton
+  const engine = reactive(createGameEngine(createInitialGameState()))
 
-  actions: {
-    playCard(playerId: string, cardIndex: number, pileIndex: 0 | 1) : boolean {
+  // AI scheduler
+  let aiIntervalId: number | null = null
 
-      const player = this.players[playerId];
-      if(!player) return false;
+  function startAI() {
+    if (aiIntervalId !== null) return
 
-      const card = player.revealed[cardIndex];
-      if(!card) return false;
+    aiIntervalId = startAIScheduler(
+      engine,
+      'player2', // joueur IA
+      400        // difficulté (ms)
+    )
+  }
 
-      const centerCard = this.centerPiles[pileIndex];
-      
-      if(!isAdjacent(card, centerCard)) {
-        console.log('Card is not adjacent to center pile');
-        return false;
-      }
-
-      //Apply move
-      this.centerPiles[pileIndex] = card;
-      player.revealed.splice(cardIndex, 1);
-
-      // Reveal next card
-      if(player.deck.length > 0) {
-        player.revealed.unshift(player.deck.shift()!);
-      }
-
-      // Win condition
-      if(player.revealed.length === 0 && player.deck.length === 0) {
-        this.status = 'finished';
-        console.log(`Player ${playerId} wins!`);
-      }
-      return true;
+  function stopAI() {
+    if (aiIntervalId !== null) {
+      clearInterval(aiIntervalId)
+      aiIntervalId = null
     }
+  }
+
+
+  function playCard(playerId: string, cardId: string, pileIndex: 0 | 1): boolean {
+    return tryPlayCard(engine, playerId, cardId, pileIndex)
+  }
+
+  return {
+    engine,
+    playCard,
+    startAI,
+    stopAI
   }
 })

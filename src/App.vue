@@ -7,16 +7,23 @@ import PlayerHand from './components/PlayerHand.vue';
 
 const game = useGameStore();
 
+game.startAI();
+
 const currentPlayerId = 'player1'
+const aiPlayerId = 'player2'
 
 const currentPlayer = computed(() => {
-  return game.players?.[currentPlayerId] ?? null
+  return game.engine.players[currentPlayerId] ?? null
+})
+
+const aiPlayer = computed(() => {
+  return game.engine.players[aiPlayerId] ?? null
 })
 
 
 const selectedCard = ref<{
   playerId: string
-  cardIndex: number
+  cardId: string
 } | null>(null)
 
 const invalidSelection = ref(false);
@@ -24,16 +31,16 @@ const invalidSelection = ref(false);
 
 function onCardSelected(payload: {
   playerId: string
-  cardIndex: number | null
+  cardId: string | null
 }) {
-  if (payload.cardIndex === null) {
+  if (payload.cardId === null) {
     selectedCard.value = null
     return
   }
 
   selectedCard.value = {
     playerId: payload.playerId,
-    cardIndex: payload.cardIndex
+    cardId: payload.cardId
   }
 }
 
@@ -42,7 +49,7 @@ function onPileSelected(pileIndex: 0 | 1) {
 
   const success = game.playCard(
     selectedCard.value.playerId,
-    selectedCard.value.cardIndex,
+    selectedCard.value.cardId,
     pileIndex
   )
 
@@ -62,26 +69,50 @@ function onPileSelected(pileIndex: 0 | 1) {
 
 </script>
 <template>
-  <PlayerHand
-    v-if="currentPlayer"
-    :cards="currentPlayer.revealed"
-    :playerId="currentPlayerId"
-    :invalid="invalidSelection"
-    @card-selected="onCardSelected"
-  />
-  <div class="center">
-    <CenterPile
-      v-for="(card, index) in game.centerPiles"
-      :key="index"
-      :card="card"
-      :pileIndex="index as 0 | 1"
-      @select-pile="onPileSelected"
+  <div class="board">
+    <PlayerHand
+      v-if="aiPlayer"
+      :cards="aiPlayer.revealed"
+      :playerId="aiPlayerId"
+      :invalid="invalidSelection"
+      @card-selected="onCardSelected"
+    />
+
+    <div class="center-row">
+      <CenterPile
+        v-for="(card, index) in game.engine.centerPiles"
+        :key="index"
+        :card="card"
+        :pileIndex="index as 0 | 1"
+        @select-pile="onPileSelected"
+      />
+    </div>
+
+    <PlayerHand
+      v-if="currentPlayer"
+      :cards="currentPlayer.revealed"
+      :playerId="currentPlayerId"
+      :invalid="invalidSelection"
+      @card-selected="onCardSelected"
     />
   </div>
 </template>
 
+<style scoped>
+  .board {
+    min-height: 100vh;
+    background: radial-gradient(circle at center, #1e1e1e, #0d0d0d);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 32px;
+}
 
-v-if="currentPlayer"
-    :cards="currentPlayer.revealed"
-    :playerId="currentPlayerId"
-    @card-selected="onCardSelected"
+  .center-row {
+    display: flex;
+    justify-content: center;
+    gap: 48px;
+    margin: 40px 0;
+  }
+
+</style>

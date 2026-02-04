@@ -12,23 +12,23 @@ const {cards, playerId} = defineProps<{
 const emit = defineEmits<{
   (e: 'card-selected', payload: {
     playerId: string
-    cardIndex: number
+    cardId: string
   }): void
 }>()
 
 // Local UI state (not game state!)
-const selectedCardIndex = ref<number | null>(null)
+const selectedCardId = ref<string | null>(null)
 
-function onSelectCard(payload: { cardIndex: number }) {
-  selectedCardIndex.value =
-    selectedCardIndex.value === payload.cardIndex
+function onSelectCard(payload: { cardId: string }) {
+  selectedCardId.value =
+    selectedCardId.value === payload.cardId
       ? null
-      : payload.cardIndex
+      : payload.cardId
 
-  if (selectedCardIndex.value !== null) {
+  if (selectedCardId.value !== null) {
     emit('card-selected', {
       playerId,
-      cardIndex: selectedCardIndex.value
+      cardId: selectedCardId.value
     })
   }
 }
@@ -40,10 +40,10 @@ function onSelectCard(payload: { cardIndex: number }) {
       v-for="(card, index) in cards"
       :key="index"
       :card="card"
-      :cardIndex="index"
+      :cardId="card.id"
       :playerId="playerId"
-      :selected="index === selectedCardIndex"
-      :invalid="invalid && index === selectedCardIndex"
+      :selected="card.id === selectedCardId"
+      :invalid="invalid && card.id === selectedCardId"
       @select="onSelectCard"
     />
   </div>
@@ -52,6 +52,9 @@ function onSelectCard(payload: { cardIndex: number }) {
 <style scoped>
 .hand {
   display: flex;
-  gap: 12px;
+  justify-content: center;
+  gap: 14px;
+  padding-bottom: 24px;
 }
+
 </style>

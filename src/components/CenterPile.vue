@@ -24,6 +24,16 @@ function onClick() {
 
 <style scoped>
 .pile {
+  padding: 20px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1);
   cursor: pointer;
+  transition: background 0.15s ease;
 }
+
+.pile:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
 </style>
