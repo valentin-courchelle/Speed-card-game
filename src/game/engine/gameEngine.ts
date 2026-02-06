@@ -28,7 +28,7 @@ export function tryPlayCard(
   playerId: PlayerId,
   cardId: string,
   pileIndex: 0 | 1
-): boolean {
+  ): boolean {
 
   const player = engine.players[playerId]
   if (!player) return false
@@ -42,6 +42,8 @@ export function tryPlayCard(
 
   // Apply move
   engine.centerPiles[pileIndex] = card
+
+  // Remove played card from player's revealed
   player.revealed.splice(cardIndex, 1)
   engine.lastMove = {
     playerId,
@@ -49,9 +51,10 @@ export function tryPlayCard(
     pileIndex
   }
 
-  // Reveal next card
+  // Reveal next card at the same position if possible
   if (player.deck.length > 0) {
-    player.revealed.unshift(player.deck.shift()!)
+    const nextCard = player.deck.shift()!
+    player.revealed.splice(cardIndex, 0, nextCard)
   }
 
   // blocked game check
