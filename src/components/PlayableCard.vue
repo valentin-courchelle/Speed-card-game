@@ -24,6 +24,7 @@ function onClick() {
 <template>
   <div
     class="playable"
+    :data-card-id="cardId"
     :class="{ selected, invalid }"
     @click="onClick"
   >

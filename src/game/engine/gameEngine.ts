@@ -5,10 +5,18 @@ import { isAdjacent, canPlay } from '../rules/rules'
 
 export type PlayerId = string
 
+export interface PlayedMove {
+  playerId: string
+  cardId: string
+  pileIndex: 0 | 1
+}
+
+
 export interface GameEngineState {
   centerPiles: [Card, Card]
   players: Record<PlayerId, PlayerState>
   status: 'playing' | 'blocked' | 'finished'
+  lastMove: PlayedMove | null
 }
 
 export function createGameEngine(initialState: GameEngineState): GameEngineState {
@@ -35,6 +43,11 @@ export function tryPlayCard(
   // Apply move
   engine.centerPiles[pileIndex] = card
   player.revealed.splice(cardIndex, 1)
+  engine.lastMove = {
+    playerId,
+    cardId,
+    pileIndex
+  }
 
   // Reveal next card
   if (player.deck.length > 0) {

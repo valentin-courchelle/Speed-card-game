@@ -35,7 +35,7 @@ function onSelectCard(payload: { cardId: string }) {
 </script>
 
 <template>
-  <div class="hand">
+  <div class="hand" :data-player-id="playerId">
     <PlayableCard
       v-for="(card, index) in cards"
       :key="index"
