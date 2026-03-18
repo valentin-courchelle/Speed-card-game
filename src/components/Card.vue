@@ -25,7 +25,85 @@
   const isRed = computed(() => {
     return props.card.suit === 'hearts' || props.card.suit === 'diamonds'
   })
-  
+
+  const isFaceCard = computed(() => {
+    return props.card.rank === 11
+    || props.card.rank === 12
+    || props.card.rank === 13
+  })
+
+  const isAs = computed(() => {
+    return props.card.rank === 1
+  })
+
+  type Cell = [number, number]
+
+const pipLayouts: Record<number, Cell[]> = {
+  1: [[4,3]],
+
+  2: [
+    [2,3],
+    [6,3]
+  ],
+
+  3: [
+    [2,3],
+    [4,3],
+    [6,3]
+  ],
+
+  4: [
+    [1,2], [1,4],
+    [7,2], [7,4]
+  ],
+
+  5: [
+    [1,2], [1,4],
+    [4,3],
+    [7,2], [7,4]
+  ],
+
+  6: [
+    [1,2], [1,4],
+    [4,2], [4,4],
+    [7,2], [7,4]
+  ],
+
+  7: [
+    [1,2], [1,4],
+    [3,3],
+    [4,2], [4,4],
+    [7,2], [7,4]
+  ],
+
+  8: [
+    [1,2], [1,4],
+    [3,2], [3,4],
+    [5,2], [5,4],
+    [7,2], [7,4]
+  ],
+
+  9: [
+    [1,2], [1,4],
+    [3,2], [3,4],
+    [4,3],
+    [5,2], [5,4],
+    [7,2], [7,4]
+  ],
+
+  10: [
+    [1,2], [1,4],
+    [2,3],
+    [3,2], [3,4],
+    [5,2], [5,4],
+    [6,3],
+    [7,2], [7,4]
+  ]
+}
+
+  const pips = computed(() => {
+    return pipLayouts[props.card.rank] ?? []
+  })
 
   const emit = defineEmits<{
     (e: 'animation-end'): void
@@ -86,7 +164,33 @@
     </div>
 
     <div class="center">
-      <SuitSymbol :suit="card.suit"/>
+
+      <template v-if="isFaceCard">
+        <div class="face">
+          {{ rankLabel }}
+        </div>
+      </template>
+
+      <template v-else>
+
+        <div class="pips-grid">
+
+          <SuitSymbol
+            v-for="(cell, i) in pips"
+            :key="i"
+            :suit="card.suit"
+            class="pip"
+            :style="{
+              gridRow: cell[0],
+              gridColumn: cell[1]
+            }"
+            :class="{ flipped: cell[0] > 4 , as: isAs}"
+          />
+
+        </div>
+
+      </template>
+
     </div>
 
     <div class="corner bottom">
@@ -99,8 +203,8 @@
 
 <style scoped>
 .card {
-  width: 90px;
-  height: 130px;
+  width: 96px;
+  height: 140px;
   border-radius: 8px;
   border: 1px solid #d0d0d0;
   background: white;
@@ -128,12 +232,17 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-
+  height: 16px;
   font-size: 16px;
 }
 
 .corner.bottom {
   transform: rotate(180deg);
+}
+
+.center{
+  width: 100%;
+  overflow: hidden;
 }
 
 
@@ -142,15 +251,34 @@
   font-weight: bold;
 }
 
-.center {
-  transform: scale(1.6);
+.pips-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(7, 1fr);
+
+  width: 100%;
+  height: 100%;
+
+  justify-items: center;
+  align-items: center;
 }
 
-/* .suit {
-  align-self: flex-end;
-  font-size: 14px;
-} */
+.pip {
+  width: 70%;
+  aspect-ratio: 1;
+}
 
+.face{
+  font-weight: bold;
+}
+
+.as{
+  transform: scale(1.5);
+}
+
+.flipped {
+  transform: rotate(180deg);
+}
 
 .flying {
   z-index: 100;

@@ -26,7 +26,7 @@ const suitSrc = {
 
 <style scoped>
 .suit {
-  width: 18px;
-  height: 18px;
+  width: auto;
+  height: 100%;
 }
 </style>
