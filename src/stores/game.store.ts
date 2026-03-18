@@ -35,7 +35,7 @@ export const useGameStore = defineStore('game', () => {
     aiIntervalId = startAIScheduler(
       engine,
       'player2', // joueur IA
-      2000        // difficulté (ms)
+      3000        // difficulté (ms)
     )
   }
 

@@ -162,7 +162,7 @@
 <style scoped>
   .board {
     min-height: 100vh;
-    background: radial-gradient(circle at center, #1e1e1e, #0d0d0d);
+    background: radial-gradient(circle, #2e7d32, #1b5e20);
     display: flex;
     flex-direction: column;
     justify-content: space-between;

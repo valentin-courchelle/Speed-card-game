@@ -43,12 +43,12 @@ function onClick() {
 
 .playable.selected {
   transform: translateY(-12px);
-  box-shadow: 0 0 0 3px #42b883;
+  box-shadow: 0 0 0 5px #457ab2;
 }
 
 /* INVALID STATE */
 .playable.invalid {
-  box-shadow: 0 0 0 3px #e74c3c;
+  box-shadow: 0 0 0 5px #e74c3c;
   animation: shake 0.4s;
 }
 

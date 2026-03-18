@@ -1,6 +1,7 @@
-<<script setup lang="ts">
+<script setup lang="ts">
   import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
   import type { Card as CardType } from '../stores/game.store'
+  import SuitSymbol from './SuitSymbol.vue'
 
   interface Props {
     card: CardType
@@ -10,6 +11,21 @@
   }
 
   const props = defineProps<Props>()
+
+  const rankLabel = computed(() => {
+    switch (props.card.rank) {
+      case 1: return 'A'
+      case 11: return 'J'
+      case 12: return 'Q'
+      case 13: return 'K'
+      default: return props.card.rank.toString()
+    }
+  })
+
+  const isRed = computed(() => {
+    return props.card.suit === 'hearts' || props.card.suit === 'diamonds'
+  })
+  
 
   const emit = defineEmits<{
     (e: 'animation-end'): void
@@ -62,14 +78,22 @@
 </script>
 
 <template>
-  <div 
-    ref="el"
-    class="card"
-    :class="{ flying: isFlying }"
-    :style="styleFlying"
-  >
-    <div class="rank">{{ card.rank }}</div>
-    <div class="suit">{{ card.suit }}</div>
+  <div class="card" :class="{ red: isRed }">
+
+    <div class="corner top">
+      <span class="rank">{{ rankLabel }}</span>
+      <SuitSymbol :suit="card.suit"/>
+    </div>
+
+    <div class="center">
+      <SuitSymbol :suit="card.suit"/>
+    </div>
+
+    <div class="corner bottom">
+      <span class="rank">{{ rankLabel }}</span>
+      <SuitSymbol :suit="card.suit"/>
+    </div>
+
   </div>
 </template>
 
@@ -78,15 +102,21 @@
   width: 90px;
   height: 130px;
   border-radius: 8px;
-  border: 1px solid #333;
+  border: 1px solid #d0d0d0;
   background: white;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 8px;
+  padding: 2px;
   cursor: pointer;
   user-select: none;
-  color: black
+  color: black;
+  /* font-family: "Georgia", serif; */
+  position: relative;
+}
+
+.card.red {
+  color: #d12c2c;
 }
 
 .card:hover {
@@ -94,15 +124,32 @@
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
+.corner {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  font-size: 16px;
+}
+
+.corner.bottom {
+  transform: rotate(180deg);
+}
+
+
 .rank {
-  font-size: 20px;
+  /* font-size: 20px; */
   font-weight: bold;
 }
 
-.suit {
+.center {
+  transform: scale(1.6);
+}
+
+/* .suit {
   align-self: flex-end;
   font-size: 14px;
-}
+} */
 
 
 .flying {
